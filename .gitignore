@@ -1,3 +1,6 @@
+#IDE Directory
+./idea/
+
 # Java class files
 *.class
 
