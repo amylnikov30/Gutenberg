@@ -1,14 +1,16 @@
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.rdd.RDDFunctions;
 import org.apache.spark.rdd.RDD;
+import scala.Tuple2;
 import scala.reflect.ClassTag;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Set;
 
 public class SearchEngine
 {
@@ -39,6 +41,7 @@ public class SearchEngine
     {
 //        final JavaPairRDD<String, String> files = ctx.wholeTextFiles(pathToData);
 
+        // TODO: Fix this
         // Temporarily reading from disk like this bc I can't get the wholeTextFiles() method to work
         JavaRDD<String> data = ctx.parallelize(List.of(""));
         File dataDir = new File(pathToData);
@@ -52,9 +55,12 @@ public class SearchEngine
                 data = data.union(singleTextFile);
             }
 
-        JavaRDD<String> windowFrames = getWindowFrames(data, searchTerm.trim().split(" ").length);
+        final Set<String> searchTermBigrams = JaccardEngine.getNgrams(searchTerm, 2);
 
-        return null;
+        return getWindowFrames(data, searchTerm.trim().split(" ").length)
+                .mapToPair(e ->
+                        new Tuple2<>(e, JaccardEngine.getJaccardIndex(JaccardEngine.getNgrams(e, 2), searchTermBigrams))
+                ).filter(e -> e._2 >= jaccardThreshold).keys().collect();
     }
 
     /**

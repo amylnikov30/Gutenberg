@@ -17,49 +17,53 @@ public class CS1003P4
 //        Logger.getLogger("org").setLevel(Level.OFF);
 //        Logger.getLogger("akka").setLevel(Level.OFF);
 
+        final String DATA_DIR = args[0];
+        final String SEARCH_TERM = args[1];
+        final float JACCARD_THRESHOLD = Float.parseFloat(args[2]);
+
         SearchEngine.init();
 
-        SearchEngine.search("setting sail to the rising wind", "./Tests/data/", 0.3f);
+        SearchEngine.search(SEARCH_TERM, DATA_DIR, JACCARD_THRESHOLD).forEach(System.out::println);
 
         SearchEngine.close();
 
-        final int n = 5;
-        final String SEARCH_TERM = "this a file";
-        final float JACCARD_THRESHOLD = 0.3f;
-
-        final SparkConf conf = new SparkConf();
-        conf.setAppName("CS1003P4");
-        conf.setMaster("local[*]");
+//        final int n = 5;
+//        final String SEARCH_TERM = "this a file";
+//        final float JACCARD_THRESHOLD = 0.3f;
 //
-        final JavaSparkContext ctx = new JavaSparkContext(conf);
-        ctx.setLogLevel("OFF");
-
-        final String content = new Scanner(new File("sample.txt")).useDelimiter("\\Z").next();
-//        List<String> refined = List.of(content.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase().split("[ \\s\\t\\n\\r]"));
-
-        final JavaRDD<String> data = ctx.textFile("sample.txt").flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase().split("[ \\s\\t\\n\\r]")).iterator());
-
-        final ClassTag<String> STRING_CLASSTAG = scala.reflect.ClassTag$.MODULE$.apply(String.class);
-
-//        SlidingRDD<String[]> sliding = new SlidingRDD<>(data.rdd(), 5, 1, STRINGARR_CLASSTAG);
-
-        RDDFunctions<String> functions = new RDDFunctions<>(data.rdd(), STRING_CLASSTAG);
-
-        // Sliding window
-        RDD<Object> slidingRdd = functions.sliding(n);
-
-        JavaRDD<String[]> mainWorkingRdd = slidingRdd.toJavaRDD().map(e -> (String[])e);
-
-        JavaPairRDD<String[], Float> jaccardSimilarity = mainWorkingRdd.mapToPair(e -> new Tuple2<>(e, getJaccardSimilarity(e, SEARCH_TERM.split(" "))));
-        jaccardSimilarity
-                .filter(e -> e._2 >= JACCARD_THRESHOLD)
-                .foreach(e -> System.out.println(String.join(" ", e._1)));
-
-        System.out.println("----------Original------------");
-
-        jaccardSimilarity.foreach(e -> System.out.println(List.of(e._1()) + ": " + e._2()));
-
-        ctx.close();
+//        final SparkConf conf = new SparkConf();
+//        conf.setAppName("CS1003P4");
+//        conf.setMaster("local[*]");
+////
+//        final JavaSparkContext ctx = new JavaSparkContext(conf);
+//        ctx.setLogLevel("OFF");
+//
+//        final String content = new Scanner(new File("sample.txt")).useDelimiter("\\Z").next();
+////        List<String> refined = List.of(content.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase().split("[ \\s\\t\\n\\r]"));
+//
+//        final JavaRDD<String> data = ctx.textFile("sample.txt").flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase().split("[ \\s\\t\\n\\r]")).iterator());
+//
+//        final ClassTag<String> STRING_CLASSTAG = scala.reflect.ClassTag$.MODULE$.apply(String.class);
+//
+////        SlidingRDD<String[]> sliding = new SlidingRDD<>(data.rdd(), 5, 1, STRINGARR_CLASSTAG);
+//
+//        RDDFunctions<String> functions = new RDDFunctions<>(data.rdd(), STRING_CLASSTAG);
+//
+//        // Sliding window
+//        RDD<Object> slidingRdd = functions.sliding(n);
+//
+//        JavaRDD<String[]> mainWorkingRdd = slidingRdd.toJavaRDD().map(e -> (String[])e);
+//
+//        JavaPairRDD<String[], Float> jaccardSimilarity = mainWorkingRdd.mapToPair(e -> new Tuple2<>(e, getJaccardSimilarity(e, SEARCH_TERM.split(" "))));
+//        jaccardSimilarity
+//                .filter(e -> e._2 >= JACCARD_THRESHOLD)
+//                .foreach(e -> System.out.println(String.join(" ", e._1)));
+//
+//        System.out.println("----------Original------------");
+//
+//        jaccardSimilarity.foreach(e -> System.out.println(List.of(e._1()) + ": " + e._2()));
+//
+//        ctx.close();
     }
 
     private static float getJaccardSimilarity(String[] a, String[] b)
