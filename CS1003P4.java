@@ -17,6 +17,12 @@ public class CS1003P4
 //        Logger.getLogger("org").setLevel(Level.OFF);
 //        Logger.getLogger("akka").setLevel(Level.OFF);
 
+        SearchEngine.init();
+
+        SearchEngine.search("setting sail to the rising wind", "./Tests/data/", 0.3f);
+
+        SearchEngine.close();
+
         final int n = 5;
         final String SEARCH_TERM = "this a file";
         final float JACCARD_THRESHOLD = 0.3f;
