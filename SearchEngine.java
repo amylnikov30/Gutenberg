@@ -1,3 +1,5 @@
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -22,12 +24,16 @@ public class SearchEngine
      */
     public static void init()
     {
+        Logger.getLogger("org").setLevel(Level.OFF);
+        Logger.getLogger("akka").setLevel(Level.OFF);
+        Logger.getRootLogger().setLevel(Level.OFF);
+
         final SparkConf conf = new SparkConf()
                 .setAppName("CS1003P4")
                 .setMaster("local[*]");
 
         ctx = new JavaSparkContext(conf);
-        ctx.setLogLevel("ERROR");
+        ctx.setLogLevel("OFF");
     }
 
     /**
@@ -35,13 +41,13 @@ public class SearchEngine
      * @param searchTerm The search term to be searched for.
      * @param pathToData The path to the data to be searched.
      * @param jaccardThreshold The Jaccard similarity threshold.
-     * @return
+     * @return A list of matched phrases the same length as the search term.
      */
     public static List<String> search(String searchTerm, String pathToData, float jaccardThreshold) throws FileNotFoundException
     {
 //        final JavaPairRDD<String, String> files = ctx.wholeTextFiles(pathToData);
 
-        // TODO: Fix this
+        // TODO: Fix temporarily reading from disk
         // Temporarily reading from disk like this bc I can't get the wholeTextFiles() method to work
         JavaRDD<String> data = ctx.parallelize(List.of(""));
         File dataDir = new File(pathToData);
@@ -64,17 +70,18 @@ public class SearchEngine
     }
 
     /**
-     * Returns a JavaRDD where each element is a single frame of the sliding window of size {@code n}.
+     * Returns a {@code JavaRDD} where each element is a single frame of the sliding window of size {@code n}.
      * @param rawData Raw data to be split into frames.
      * @param n Size of the sliding window.
-     * @return
+     * @return {@code JavaRDD} of strings where each element is a phrase which represents a single frame of the
+     * sliding window.
      */
-    private static JavaRDD<String> getWindowFrames(JavaRDD<String> rawData, int n)
+    public static JavaRDD<String> getWindowFrames(JavaRDD<String> rawData, int n)
     {
-        RDDFunctions<String> functions = new RDDFunctions<>(rawData.rdd(), STRING_CLASSTAG);
+        final RDDFunctions<String> functions = new RDDFunctions<>(rawData.rdd(), STRING_CLASSTAG);
 
         // Sliding window
-        RDD<Object> slidingRdd = functions.sliding(n);
+        final RDD<Object> slidingRdd = functions.sliding(n);
 
         return slidingRdd.toJavaRDD().map(e -> String.join(" ", (String[])e));
     }
