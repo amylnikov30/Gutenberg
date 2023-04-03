@@ -64,16 +64,16 @@ public class SearchEngine
     /**
      * Returns a {@code JavaRDD} where each element is a single frame of the sliding window of size {@code n}.
      * @param rawData Raw data to be split into frames.
-     * @param n Size of the sliding window.
+     * @param size Size of the sliding window.
      * @return {@code JavaRDD} of strings where each element is a phrase which represents a single frame of the
      * sliding window.
      */
-    public static JavaRDD<String> getWindowFrames(JavaRDD<String> rawData, int n)
+    public static JavaRDD<String> getWindowFrames(JavaRDD<String> rawData, int size)
     {
         final RDDFunctions<String> functions = new RDDFunctions<>(rawData.rdd(), STRING_CLASSTAG);
 
         // Sliding window
-        final RDD<Object> slidingRdd = functions.sliding(n);
+        final RDD<Object> slidingRdd = functions.sliding(size);
 
         return slidingRdd.toJavaRDD().map(e -> String.join(" ", (String[])e));
     }
