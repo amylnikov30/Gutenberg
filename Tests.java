@@ -9,6 +9,13 @@ import java.util.Set;
 
 public class Tests
 {
+    private static JavaSparkContext ctx;
+
+    public static void init()
+    {
+        ctx = SearchEngine.init();
+    }
+
     public static boolean ngrams()
     {
         return
@@ -25,16 +32,16 @@ public class Tests
 
     public static boolean windowFrames()
     {
-        Logger.getLogger("org").setLevel(Level.OFF);
-        Logger.getLogger("akka").setLevel(Level.OFF);
-        Logger.getRootLogger().setLevel(Level.OFF);
+        // Logger.getLogger("org").setLevel(Level.OFF);
+        // Logger.getLogger("akka").setLevel(Level.OFF);
+        // Logger.getRootLogger().setLevel(Level.OFF);
 
-        final SparkConf conf = new SparkConf()
-                .setAppName("CS1003P4")
-                .setMaster("local[*]");
+        // final SparkConf conf = new SparkConf()
+        //         .setAppName("CS1003P4")
+        //         .setMaster("local[*]");
 
-        final JavaSparkContext ctx = new JavaSparkContext(conf);
-        ctx.setLogLevel("OFF");
+        // final JavaSparkContext ctx = new JavaSparkContext(conf);
+        // ctx.setLogLevel("OFF");
 
         final JavaRDD<String> test1 = ctx.parallelize(List.of("this is a file".split(" ")));
         final JavaRDD<String> test2 = ctx.parallelize(List.of("1 2 3 4 5 6 7".split(" ")));
@@ -46,12 +53,22 @@ public class Tests
 
     public static boolean search()
     {
-        return false;
+        final List<String> result1 = SearchEngine.search("hide the christmas tree carefully", "Tests/data", 0.75f);
+        final List<String> result2 = SearchEngine.search("either the well was very deep or she fell very slowly", "Tests/data", 1f);
+
+        return 
+            List.of("hide the christmas tree carefully", "the christmas tree carefully helen").equals(result1) &&
+            List.of("either the well was very deep or she fell very slowly").equals(result2);
     }
 
     public static boolean all()
     {
-        return ngrams() && jaccardIndex() && windowFrames();// && search();
+        return ngrams() && jaccardIndex() && windowFrames() && search();
+    }
+
+    public static void close()
+    {
+        SearchEngine.close();
     }
 
     private static boolean toleranceEquals(float a, float b)

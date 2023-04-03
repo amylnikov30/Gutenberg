@@ -1,6 +1,7 @@
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.rdd.RDDFunctions;
@@ -22,7 +23,7 @@ public class SearchEngine
     /**
      * Initializes the Spark context.
      */
-    public static void init()
+    public static JavaSparkContext init()
     {
         Logger.getLogger("org").setLevel(Level.OFF);
         Logger.getLogger("akka").setLevel(Level.OFF);
@@ -34,6 +35,8 @@ public class SearchEngine
 
         ctx = new JavaSparkContext(conf);
         ctx.setLogLevel("OFF");
+
+        return ctx;
     }
 
     /**
@@ -43,23 +46,12 @@ public class SearchEngine
      * @param jaccardThreshold The Jaccard similarity threshold.
      * @return A list of matched phrases the same length as the search term.
      */
-    public static List<String> search(String searchTerm, String pathToData, float jaccardThreshold) throws FileNotFoundException
+    public static List<String> search(String searchTerm, String pathToData, float jaccardThreshold)
     {
-//        final JavaPairRDD<String, String> files = ctx.wholeTextFiles(pathToData);
-
-        // TODO: Fix temporarily reading from disk
-        // Temporarily reading from disk like this bc I can't get the wholeTextFiles() method to work
-        JavaRDD<String> data = ctx.parallelize(List.of(""));
-        File dataDir = new File(pathToData);
-        for (File file : dataDir.listFiles())
-            if (file.isFile())
-            {
-                final JavaRDD<String> singleTextFile = ctx.textFile(file.getAbsolutePath())
-                        .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
-                        .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
-                        .filter(e -> !e.isEmpty());
-                data = data.union(singleTextFile);
-            }
+        final JavaRDD<String> data = ctx.wholeTextFiles(pathToData).values()
+                    .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
+                    .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
+                    .filter(e -> !e.isBlank());
 
         final Set<String> searchTermBigrams = JaccardEngine.getNgrams(searchTerm, 2);
 
