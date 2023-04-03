@@ -32,11 +32,9 @@ public class JaccardEngine
      */
     public static Set<String> getNgrams(String s, int n)
     {
-        Set<String> result = new HashSet<>();
+        final Set<String> result = new HashSet<>();
         for (int i=0; i<s.length()-(n-1); i++)
-        {
             result.add(s.substring(i, i+n));
-        }
 
         return result;
     }

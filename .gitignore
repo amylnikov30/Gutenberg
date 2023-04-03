@@ -1,8 +1,12 @@
-#IDE Directory
-./idea/
+#IDE Directories
+/.idea/
+/.vscode/
 
 # Java class files
 *.class
 
 # Binary/output files
 /out/
+
+# Tests:
+/Tests/

@@ -4,6 +4,8 @@ import org.apache.spark.mllib.rdd.RDDFunctions;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 import scala.reflect.ClassTag;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,8 +16,9 @@ public class CS1003P4
 {
     public static void main(String[] args) throws FileNotFoundException
     {
-//        Logger.getLogger("org").setLevel(Level.OFF);
-//        Logger.getLogger("akka").setLevel(Level.OFF);
+       Logger.getLogger("org").setLevel(Level.OFF);
+       Logger.getLogger("akka").setLevel(Level.OFF);
+       Logger.getRootLogger().setLevel(Level.OFF);
 
         final String DATA_DIR = args[0];
         final String SEARCH_TERM = args[1];
