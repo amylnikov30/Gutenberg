@@ -1,22 +1,37 @@
+import java.util.List;
+
 public class CS1003P4
 {
     public static void main(String[] args) throws IndexOutOfBoundsException
     {
-        try
-        {
-            final String DATA_DIR = args[0];
-            final String SEARCH_TERM = args[1];
-            final float JACCARD_THRESHOLD = Float.parseFloat(args[2]);
+        String DATA_DIR = "";
+        String SEARCH_TERM = "";
+        float JACCARD_THRESHOLD = 0.75f;
 
-            SearchEngine.init();
-            SearchEngine.search(SEARCH_TERM, DATA_DIR, JACCARD_THRESHOLD).forEach(System.out::println);
-            SearchEngine.close();
-        }
-        catch (IndexOutOfBoundsException ignored)
+        if (args.length > 0)
         {
-            Tests.init();
-            System.out.println("All ok: " + Tests.all());
-            Tests.close();
+            if (args.length >= 3)
+            {
+                DATA_DIR = args[0];
+                SEARCH_TERM = args[1];
+                JACCARD_THRESHOLD = Float.parseFloat(args[2]);
+//
+//                SearchEngine.init();
+//                SearchEngine.search(SEARCH_TERM, DATA_DIR, JACCARD_THRESHOLD).forEach(System.out::println);
+//                SearchEngine.close();
+            }
+
+            if (List.of(args).contains("--gui"))
+            {
+                GUI.init();
+                GUI.run(SEARCH_TERM, DATA_DIR, JACCARD_THRESHOLD);
+            }
+
+            return;
         }
+
+        Tests.init();
+        System.out.println("All ok: " + Tests.all());
+        Tests.close();
     }
 }

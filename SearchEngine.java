@@ -61,7 +61,7 @@ public class SearchEngine
             // Windows solution:
             data = ctx.parallelize(List.of(""));
             File dataDir = new File(pathToData);
-            
+            System.out.println(dataDir.getAbsolutePath());
             for (File file : dataDir.listFiles())
             {
                     if (file.isFile())
