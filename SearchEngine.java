@@ -1,7 +1,6 @@
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.rdd.RDDFunctions;
@@ -9,8 +8,6 @@ import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 import scala.reflect.ClassTag;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Set;
 
