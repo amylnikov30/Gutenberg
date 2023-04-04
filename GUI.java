@@ -86,7 +86,7 @@ public class GUI
             main.add(lb_result);
 
             lb_result.setText("");
-            result.forEach(e -> lb_result.setText(lb_result.getText() + e + ",\n"));
+            result.forEach(e -> lb_result.setText(lb_result.getText() + e + "\n"));
         });
         main.add(btn_search);
 
