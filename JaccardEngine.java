@@ -25,7 +25,7 @@ public class JaccardEngine
     }
 
     /**
-     * Takes in a word, n in n-grams and returns a set of n-grams using top-and-tail tehcnique.
+     * Takes in a word, n in n-grams and returns a set of n-grams.
      * @param s String to be split into n-grams.
      * @param n Size of n-grams.
      * @return A set of n-grams.

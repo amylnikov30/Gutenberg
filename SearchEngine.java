@@ -48,6 +48,7 @@ public class SearchEngine
      */
     public static List<String> search(String searchTerm, String pathToData, float jaccardThreshold)
     {
+        // TODO: Fix wholeTextFiles not working on Windows platforms
         final JavaRDD<String> data = ctx.wholeTextFiles(pathToData).values()
                     .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
                     .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
