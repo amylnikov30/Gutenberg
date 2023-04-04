@@ -8,6 +8,8 @@ import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 import scala.reflect.ClassTag;
 
+import java.io.File;
+
 import java.util.List;
 import java.util.Set;
 
@@ -46,10 +48,32 @@ public class SearchEngine
     public static List<String> search(String searchTerm, String pathToData, float jaccardThreshold)
     {
         // TODO: Fix wholeTextFiles not working on Windows platforms
-        final JavaRDD<String> data = ctx.wholeTextFiles(pathToData).values()
-                    .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
-                    .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
-                    .filter(e -> !e.isBlank());
+        JavaRDD<String> data;
+        if (!System.getProperty("os.name").toLowerCase().startsWith("windows"))
+        {
+            data = ctx.wholeTextFiles(pathToData).values()
+                        .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
+                        .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
+                        .filter(e -> !e.isBlank());
+        }
+        else
+        {
+            // Windows solution:
+            data = ctx.parallelize(List.of(""));
+            File dataDir = new File(pathToData);
+            
+            for (File file : dataDir.listFiles())
+            {
+                    if (file.isFile())
+                {
+                    final JavaRDD<String> singleTextFile = ctx.textFile(file.getAbsolutePath())
+                            .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
+                            .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
+                            .filter(e -> !e.isEmpty());
+                    data = data.union(singleTextFile);
+                }
+            }
+        }
 
         final Set<String> searchTermBigrams = JaccardEngine.getNgrams(searchTerm, 2);
 
