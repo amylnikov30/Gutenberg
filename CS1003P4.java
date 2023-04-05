@@ -10,15 +10,16 @@ public class CS1003P4
 
         if (args.length > 0)
         {
+            SearchEngine.init();
             if (args.length >= 3)
             {
                 DATA_DIR = args[0];
                 SEARCH_TERM = args[1];
                 JACCARD_THRESHOLD = Float.parseFloat(args[2]);
-//
-//                SearchEngine.init();
-//                SearchEngine.search(SEARCH_TERM, DATA_DIR, JACCARD_THRESHOLD).forEach(System.out::println);
-//                SearchEngine.close();
+
+                SearchEngine.search(SEARCH_TERM, DATA_DIR, JACCARD_THRESHOLD).forEach(System.out::println);
+//                if (!List.of(args).contains("--gui"))
+//                    SearchEngine.close();
             }
 
             if (List.of(args).contains("--gui"))

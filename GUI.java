@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 
 import java.io.File;
@@ -34,28 +33,29 @@ public class GUI
             }
         });
 
-        SearchEngine.init();
+//        SearchEngine.init();
 
         window.setSize(new Dimension(500, 500));
 //        window.setVisible(true);
     }
 
-    public static void run(String pathToData, String searchTerm, float jaccardThreshold)
+    public static void run(String searchTerm, String pathToData, float jaccardThreshold)
     {
         final JPanel main = new JPanel();
         main.setLayout(new FlowLayout());
 
-        final JTextField tf_pathToData = new JTextField(pathToData);
-        main.add(tf_pathToData);
-
-        final JTextField tf_searchTerm = new JTextField(searchTerm);
+        final JTextField tf_searchTerm = new JTextField(searchTerm.isBlank() ? "Search term" : searchTerm, 30);
         main.add(tf_searchTerm);
 
-        final JButton btn_loadPathToData = new JButton("Choose data directory");
+        final JTextField tf_pathToData = new JTextField(pathToData.isBlank() ? "Path/to/data" : pathToData, 7);
+        main.add(tf_pathToData);
+
+        final JButton btn_loadPathToData = new JButton("...");
         btn_loadPathToData.addActionListener(e ->
         {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(Paths.get("Tests/data").toFile());
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setCurrentDirectory(Paths.get("").toFile());
 
             if (fileChooser.showOpenDialog(main) == JFileChooser.APPROVE_OPTION) {
 
@@ -64,29 +64,32 @@ public class GUI
                 {
                     tf_pathToData.setText(file.getPath());
                 }
-                catch(Exception exc)
+                catch(Exception exception)
                 {
-                    exc.printStackTrace();
+                    exception.printStackTrace();
                 }
             }
         });
         main.add(btn_loadPathToData);
 
-        final JTextField tf_jaccardThreshold = new JTextField(Float.toString(jaccardThreshold));
+        final JTextField tf_jaccardThreshold = new JTextField(Float.toString(jaccardThreshold), 3);
         main.add(tf_jaccardThreshold);
+
+        final JTextArea ta_result = new JTextArea("");
+        ta_result.setEditable(false);
 
         final JButton btn_search = new JButton("Search");
         btn_search.addActionListener(a ->
         {
-            final List<String> result = SearchEngine.search(tf_pathToData.getText(), tf_searchTerm.getText(),
+            main.remove(ta_result);
+
+            final List<String> result = SearchEngine.search(tf_searchTerm.getText(), tf_pathToData.getText(),
                     Float.parseFloat(tf_jaccardThreshold.getText()));
 
-            final JTextArea lb_result = new JTextArea("");
-            lb_result.setEditable(false);
-            main.add(lb_result);
+            main.add(ta_result);
 
-            lb_result.setText("");
-            result.forEach(e -> lb_result.setText(lb_result.getText() + e + "\n"));
+            ta_result.setText("");
+            result.forEach(e -> ta_result.setText(ta_result.getText() + e + "\n"));
         });
         main.add(btn_search);
 

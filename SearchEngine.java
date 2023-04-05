@@ -9,7 +9,7 @@ import scala.Tuple2;
 import scala.reflect.ClassTag;
 
 import java.io.File;
-
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +41,7 @@ public class SearchEngine
     /**
      * Searches for a given search term in a given path to data.
      * @param searchTerm The search term to be searched for.
-     * @param pathToData The path to the data to be searched.
+     * @param pathToData The path to the data" to be searched.
      * @param jaccardThreshold The Jaccard similarity threshold.
      * @return A list of matched phrases the same length as the search term.
      */
@@ -60,11 +60,11 @@ public class SearchEngine
         {
             // Windows solution:
             data = ctx.parallelize(List.of(""));
+            // Can only read relative paths.
             File dataDir = new File(pathToData);
-            System.out.println(dataDir.getAbsolutePath());
             for (File file : dataDir.listFiles())
             {
-                    if (file.isFile())
+                if (file.isFile())
                 {
                     final JavaRDD<String> singleTextFile = ctx.textFile(file.getAbsolutePath())
                             .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
