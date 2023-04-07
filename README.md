@@ -2,7 +2,7 @@
 CS1003P4
 
 ## Compiling
-    javac -d "<outputPath>" -cp "/cs/studres/CS1003/0-General/spark/*" *.java
+    javac -Xlint:unchecked -d "<outputPath>" -cp "/cs/studres/CS1003/0-General/spark/*" *.java
 
 ## Running
 For Windows replace `:` with `;`

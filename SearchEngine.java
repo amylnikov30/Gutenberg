@@ -78,12 +78,12 @@ public class SearchEngine
         final Set<String> searchTermBigrams = JaccardEngine.getNgrams(searchTerm, 2);
 
 
-        //TODO: Don't use JavaPairRDD, calculate Jaccard index in filter.
+        //TODO: Don't use JavaPairRDD, instead calculate Jaccard index in filter.
         return getWindowFrames(data, searchTerm.trim().split(" ").length)
-                .mapToPair(e ->
-                        new Tuple2<>(e, JaccardEngine.getJaccardIndex(
-                                JaccardEngine.getNgrams(e, 2), searchTermBigrams))
-                ).filter(e -> e._2 >= jaccardThreshold).keys().collect();
+//                .mapToPair(e ->
+//                        new Tuple2<>(e, JaccardEngine.getJaccardIndex(
+//                                JaccardEngine.getNgrams(e, 2), searchTermBigrams))
+                .filter(e -> JaccardEngine.getJaccardIndex(JaccardEngine.getNgrams(e, 2), searchTermBigrams) >= jaccardThreshold).collect();
     }
 
     /**
