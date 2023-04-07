@@ -52,9 +52,9 @@ public class SearchEngine
         if (!System.getProperty("os.name").toLowerCase().startsWith("windows"))
         {
             data = ctx.wholeTextFiles(pathToData).values()
-                        .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
-                        .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
-                        .filter(e -> !e.isBlank());
+                            .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase()).iterator())
+                            .flatMap(e -> List.of(e.split("[\\s\\t\\n\\r]")).iterator())
+                            .filter(e -> !e.isEmpty());
         }
         else
         {
