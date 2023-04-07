@@ -41,13 +41,13 @@ public class SearchEngine
     /**
      * Searches for a given search term in a given path to data.
      * @param searchTerm The search term to be searched for.
-     * @param pathToData The path to the data" to be searched.
+     * @param pathToData The path to the data to be searched.
      * @param jaccardThreshold The Jaccard similarity threshold.
      * @return A list of matched phrases the same length as the search term.
      */
     public static List<String> search(String searchTerm, String pathToData, float jaccardThreshold)
     {
-        // TODO: Fix wholeTextFiles not working on Windows platforms
+        // TODO: Check data cleaning (this is one of the window frames: so much support is thisif the).
         JavaRDD<String> data;
         if (!System.getProperty("os.name").toLowerCase().startsWith("windows"))
         {
@@ -67,8 +67,8 @@ public class SearchEngine
                 if (file.isFile())
                 {
                     final JavaRDD<String> singleTextFile = ctx.textFile(file.getAbsolutePath())
-                            .flatMap(e -> List.of(e.split("[ \\s\\t\\n\\r]")).iterator())
-                            .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()).iterator())
+                            .flatMap(e -> List.of(e.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase()).iterator())
+                            .flatMap(e -> List.of(e.split("[\\s\\t\\n\\r]")).iterator())
                             .filter(e -> !e.isEmpty());
                     data = data.union(singleTextFile);
                 }
@@ -77,9 +77,12 @@ public class SearchEngine
 
         final Set<String> searchTermBigrams = JaccardEngine.getNgrams(searchTerm, 2);
 
+
+        //TODO: Don't use JavaPairRDD, calculate Jaccard index in filter.
         return getWindowFrames(data, searchTerm.trim().split(" ").length)
                 .mapToPair(e ->
-                        new Tuple2<>(e, JaccardEngine.getJaccardIndex(JaccardEngine.getNgrams(e, 2), searchTermBigrams))
+                        new Tuple2<>(e, JaccardEngine.getJaccardIndex(
+                                JaccardEngine.getNgrams(e, 2), searchTermBigrams))
                 ).filter(e -> e._2 >= jaccardThreshold).keys().collect();
     }
 
